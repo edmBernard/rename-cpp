@@ -31,7 +31,7 @@ jobs:
     - name: Install (gcc-9) (Linux)
       if: runner.os == 'Linux'
       run: |
-        echo "::set-env name=CXX::${{ matrix.config.compiler }}"
+        echo "name=CXX::${{ matrix.config.compiler }}" >> $GITHUB_ENV
     - name: vcpkg
       shell: bash
       run: |
