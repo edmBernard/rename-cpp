@@ -31,7 +31,7 @@ jobs:
     - name: Install (gcc-9) (Linux)
       if: runner.os == 'Linux'
       run: |
-        echo "name=CXX::${{ matrix.config.compiler }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.config.compiler }}" >> $GITHUB_ENV
     - name: vcpkg
       shell: bash
       run: |
@@ -45,7 +45,7 @@ jobs:
         cd vcpkg
         ./vcpkg list
     - name: cmake
-      run: cmake . -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+      run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
     - name: make
       run: cmake --build . --config ${{ matrix.config.build_type }}
     - uses: actions/upload-artifact@v1
