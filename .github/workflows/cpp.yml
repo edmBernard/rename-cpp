@@ -18,7 +18,7 @@ jobs:
           compiler: g++-9
           build_type: "Release"
         - os: windows-latest
-          triplet: "x64-windows-static"
+          triplet: "x64-windows"
           artifact: Release
           build_type: "Release"
 
