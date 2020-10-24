@@ -5,6 +5,7 @@
 #include <regex>
 
 #include <cxxopts.hpp>
+#include <fmt/core.h>
 
 namespace fs = std::filesystem;
 
@@ -25,7 +26,7 @@ int main(int argc, char **argv) {
       ("v,verbose", "print names of files successfully renamed")
       ;
     // clang-format on
-    options.parse_positional({"match", "replace", "directory"});
+    options.parse_positional({"regex", "format", "directory"});
     auto result = options.parse(argc, argv);
 
     if (result.count("help")) {
@@ -48,8 +49,8 @@ int main(int argc, char **argv) {
       return 1;
     }
 
-    const std::regex rule(result["match"].as<std::string>());
-    const std::string format(result["replace"].as<std::string>());
+    const std::regex rule(result["regex"].as<std::string>());
+    const std::string format(result["format"].as<std::string>());
 
     for(auto& p: fs::directory_iterator(directory)) {
       fs::path pathAbsolute = fs::absolute(p.path());
@@ -62,7 +63,7 @@ int main(int argc, char **argv) {
 
       if (pathAbsolute != newPath) {
         if (result.count("verbose")) {
-          std::cout << pathAbsolute.filename() << "  will be renamed in  " << newPath.filename() << std::endl;
+          fmt::print("{:40} will be renamed in  {}\n", pathAbsolute.filename().string(), newPath.filename().string());
         }
 
         if (!result.count("no-act")) {
