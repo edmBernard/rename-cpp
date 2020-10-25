@@ -1,11 +1,12 @@
 # rename-cpp [![C++ CI](https://github.com/edmBernard/rename-cpp/workflows/C++%20CI/badge.svg?branch=master)](https://github.com/edmBernard/rename-cpp/actions)
-Minimalist command line tool to track time spend
+
+Tool to rename files based on Regex
 
 ## Dependencies
 
 We use [vcpkg](https://github.com/Microsoft/vcpkg) to manage dependencies
 
-KoTH-snake depend on:
+rename-cpp depend on:
 - [cxxopts](https://github.com/jarro2783/cxxopts): Command line argument parsing
 - [fmt](https://fmt.dev/latest/index.html): A modern formatting library
 
