@@ -6,7 +6,7 @@ Tool to rename files based on Regex
 
 We use [vcpkg](https://github.com/Microsoft/vcpkg) to manage dependencies
 
-rename-cpp depend on:
+rename-cpp depends on:
 - [cxxopts](https://github.com/jarro2783/cxxopts): Command line argument parsing
 - [fmt](https://fmt.dev/latest/index.html): A modern formatting library
 
