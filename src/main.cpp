@@ -6,6 +6,7 @@
 
 #include <cxxopts.hpp>
 #include <fmt/core.h>
+#include <fmt/color.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/cfg/env.h>
 
@@ -28,6 +29,7 @@ int main(int argc, char **argv) {
       ("regex", "the regular expression that will be matched against the filename", cxxopts::value<std::string>())
       ("format", "the regex replacement format string", cxxopts::value<std::string>())
       ("v,verbose", "print names of files successfully renamed")
+      ("no-color", "disable color in verbose mode")
       ;
     // clang-format on
     options.parse_positional({"regex", "format", "directory"});
@@ -67,6 +69,8 @@ int main(int argc, char **argv) {
     spdlog::debug("  directory : {}", result["directory"].as<std::string>());
     spdlog::debug("  regex     : {}", result["regex"].as<std::string>());
     spdlog::debug("  format    : {}", result["format"].as<std::string>());
+    spdlog::debug("  no-act    : {}", result["no-act"].count());
+    spdlog::debug("  no-color  : {}", result["no-color"].count());
 
     const std::regex rule(result["regex"].as<std::string>());
     const std::string format(result["format"].as<std::string>());
@@ -82,8 +86,15 @@ int main(int argc, char **argv) {
 
       if (pathAbsolute != newPath) {
         if (result.count("verbose")) {
-          fmt::print("{:40} will be renamed in  {}\n", pathAbsolute.filename().string(), newPath.filename().string());
+          if (result.count("no-color")) {
+            fmt::print("{:40} will be renamed in  {}\n", pathAbsolute.filename().string(), newPath.filename().string());
+          } else {
+            fmt::print(fg(fmt::color::steel_blue), "{:40}", pathAbsolute.filename().string());
+            fmt::print(" will be renamed in  ", pathAbsolute.filename().string(), newPath.filename().string());
+            fmt::print(fg(fmt::color::aqua), "{}\n", newPath.filename().string());
+          }
         }
+
 
         if (!result.count("no-act")) {
           fs::rename(pathAbsolute, newPath);
