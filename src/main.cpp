@@ -6,11 +6,15 @@
 
 #include <cxxopts.hpp>
 #include <fmt/core.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/cfg/env.h>
 
 namespace fs = std::filesystem;
 
 int main(int argc, char **argv) {
   try {
+    spdlog::cfg::load_env_levels();
+
     // =================================================================================================
     // CLI
     cxxopts::Options options(argv[0], "Tool to rename files based on Regex");
@@ -35,19 +39,34 @@ int main(int argc, char **argv) {
     }
 
     if (!result.count("directory")) {
-      std::cout << "Error: directory argument required" << std::endl;
+      spdlog::error("Directory argument required");
       return 1;
     }
 
     fs::path directory(result["directory"].as<std::string>());
     if (!fs::exists(directory)) {
-      std::cout << "Error: directory does not exist" << std::endl;
+      spdlog::error("Specified directory does not exist");
       return 1;
     }
     if (!fs::is_directory(directory)) {
-      std::cout << "Error: specified directory is not a directory" << std::endl;
+      spdlog::error("Specified directory is not a directory");
       return 1;
     }
+
+    if (!result.count("regex")) {
+      spdlog::error("Missing input regex");
+      return 1;
+    }
+
+    if (!result.count("format")) {
+      spdlog::error("Missing format regex, if you tried to pass empty string use --format=\"\" instead.");
+      return 1;
+    }
+
+    spdlog::debug("CommandLine Argument passed: ");
+    spdlog::debug("  directory : {}", result["directory"].as<std::string>());
+    spdlog::debug("  regex     : {}", result["regex"].as<std::string>());
+    spdlog::debug("  format    : {}", result["format"].as<std::string>());
 
     const std::regex rule(result["regex"].as<std::string>());
     const std::string format(result["format"].as<std::string>());
@@ -74,7 +93,10 @@ int main(int argc, char **argv) {
 
 
   } catch (const cxxopts::OptionException &e) {
-    std::cout << "Error: parsing options: " << e.what() << std::endl;
+    spdlog::error("Parsing options : {}", e.what());
+    return 1;
+  } catch (const std::exception &e) {
+    spdlog::error("{}", e.what());
     return 1;
   }
   return 0;

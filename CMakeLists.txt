@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 3.5)
 # Find Package ************************************************************************************
 find_package(cxxopts CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 
 #**************************************************************************************************
@@ -42,4 +43,4 @@ SET(SOURCES
 # Make configuration ******************************************************************************
 add_executable(rename ${SOURCES})
 set_property(TARGET rename PROPERTY CXX_STANDARD 20)
-target_link_libraries(rename -pthread -lstdc++fs fmt::fmt)
+target_link_libraries(rename -pthread -lstdc++fs fmt::fmt spdlog::spdlog)
