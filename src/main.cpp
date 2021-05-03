@@ -24,12 +24,12 @@ int main(int argc, char **argv) {
     // clang-format off
     options.add_options()
       ("h,help", "Print help")
-      ("n,no-act", "show what files would have been renamed but do nothing")
-      ("d,directory", "the directory containing files to rename", cxxopts::value<std::string>(), "DIRECTORY")
-      ("regex", "the regular expression that will be matched against the filename", cxxopts::value<std::string>())
-      ("format", "the regex replacement format string", cxxopts::value<std::string>())
-      ("v,verbose", "print names of files successfully renamed")
-      ("no-color", "disable color in verbose mode")
+      ("no-dry-run", "Actually apply the changes")
+      ("d,directory", "The directory containing files to rename", cxxopts::value<std::string>(), "DIRECTORY")
+      ("regex", "The regular expression that will be matched against the filename", cxxopts::value<std::string>())
+      ("format", "The regex replacement format string", cxxopts::value<std::string>())
+      ("v,verbose", "Print names of files successfully renamed")
+      ("no-color", "Disable color in verbose mode")
       ;
     // clang-format on
     options.parse_positional({"regex", "format", "directory"});
@@ -66,15 +66,16 @@ int main(int argc, char **argv) {
     }
 
     spdlog::debug("CommandLine Argument passed: ");
-    spdlog::debug("  directory : {}", result["directory"].as<std::string>());
-    spdlog::debug("  regex     : {}", result["regex"].as<std::string>());
-    spdlog::debug("  format    : {}", result["format"].as<std::string>());
-    spdlog::debug("  no-act    : {}", result["no-act"].count());
-    spdlog::debug("  no-color  : {}", result["no-color"].count());
+    spdlog::debug("  directory  : {}", result["directory"].as<std::string>());
+    spdlog::debug("  regex      : {}", result["regex"].as<std::string>());
+    spdlog::debug("  format     : {}", result["format"].as<std::string>());
+    spdlog::debug("  no-dry-run : {}", result["no-dry-run"].count());
+    spdlog::debug("  no-color   : {}", result["no-color"].count());
 
     const std::regex rule(result["regex"].as<std::string>());
     const std::string format(result["format"].as<std::string>());
 
+    bool noRenamingDone = true;
     for(auto& p: fs::directory_iterator(directory)) {
       fs::path pathAbsolute = fs::absolute(p.path());
       if (!fs::is_regular_file(pathAbsolute)) {
@@ -95,13 +96,21 @@ int main(int argc, char **argv) {
           }
         }
 
-
-        if (!result.count("no-act")) {
+        noRenamingDone = false;
+        if (result.count("no-dry-run")) {
           fs::rename(pathAbsolute, newPath);
         }
+
       }
     }
 
+    if (noRenamingDone) {
+      spdlog::info("No renaming to do with current parameters.");
+    }
+
+    if (!result.count("no-dry-run")) {
+      spdlog::info("If you are sure you want to apply the changes, run this command with the --no-dry-run option.");
+    }
 
   } catch (const cxxopts::OptionException &e) {
     spdlog::error("Parsing options : {}", e.what());

@@ -25,6 +25,15 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake
 cmake --build . --config Release
 ```
 
+## Logger
+
+```bash
+// On windows
+$Env:SPDLOG_LEVEL = "debug"
+// On Linux
+export SPDLOG_LEVEL=debug
+```
+
 ## Disclaimer
 
-It's a toy project. Your comments are welcome, if you spot error or improvement.
+It's a toy project. Your comments are welcome, if you spot any error or improvement.
